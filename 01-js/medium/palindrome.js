@@ -4,7 +4,12 @@
 */
 
 function isPalindrome(str) {
-  return true;
+  str = str.toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
+  const reversed = str.split('').reverse().join('');
+  return str === reversed;
 }
 
 module.exports = isPalindrome;
+
+// [^a-zA-Z0-9] { ^ means Includes } {g -> global}
+// If it includes a-z A-Z 0-9 dont remove, Remove everthing else
