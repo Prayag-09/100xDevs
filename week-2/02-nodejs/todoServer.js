@@ -36,14 +36,60 @@
     Example: DELETE http://localhost:3000/todos/123
 
     - For any other route not defined in the server return 404
-
-  Testing the server - run `npm run test-todoServer` command in terminal
  */
   const express = require('express');
   const bodyParser = require('body-parser');
-  
   const app = express();
-  
   app.use(bodyParser.json());
   
+  // const fs = require('fs');
+  // const file = "./files/a.txt"
+  const port = 3000;
+
+  let todo = [];
+
+  app.get('/todos', (req,res) => {
+    // fs.readFile(file,"utf-8", (err,data) => {
+      if(err) throw err;
+      res.status(200).json(JSON.stringify(data));
+   //  })
+  })
+
+  app.get('/todos/:id' ,(req,res) => {
+    const getID = todo.find(a => a.id === parseInt(req.params.id));
+    if(getID){
+      res.json(todo).status(200);
+    } else {
+      res.status(404).send()
+    }
+});
+
+  app.post('/todos' ,(req,res) => {
+    const {title, description} = req.body
+    const userID = Math.floor(Math.random() * 1000000);
+    const newUser = {id : userID , title, description};
+    todo.push(newUser);
+
+    res.status(201).json({newUser});
+  })
+
+  app.put('/todos/:id' , (req,res) => {
+    const userID = todo.findIndex(a => a.id === parseInt(req.params.id));
+    if(!userID){
+      res.status(404)
+    }
+    userID.id = req.body.id;
+    res.status(200).json({id :req.body.id})
+  })
+
+  app.delete('/todos/:id' , (req,res) => {
+    const userID = todo.findIndex(req.params.id);
+    if(userID){
+      todo = todo.removeIndex(req.params.id)
+      res.status(200).json({message : "Deleted"})
+    } else {
+      res.status(404)
+    }
+  })
+  app.listen(port, ()=>{console.log(`http://localhost:${port}/`)})
   module.exports = app;
