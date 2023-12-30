@@ -41,55 +41,56 @@
   const bodyParser = require('body-parser');
   const app = express();
   app.use(bodyParser.json());
-  
-  // const fs = require('fs');
-  // const file = "./files/a.txt"
-  const port = 3000;
 
-  let todo = [];
+  let todos = [];
 
   app.get('/todos', (req,res) => {
-    // fs.readFile(file,"utf-8", (err,data) => {
-      if(err) throw err;
-      res.status(200).json(JSON.stringify(data));
-   //  })
+      res.json(todos);
   })
 
   app.get('/todos/:id' ,(req,res) => {
-    const getID = todo.find(a => a.id === parseInt(req.params.id));
-    if(getID){
-      res.json(todo).status(200);
+    const todo = todos.find(t => t.id === parseInt(req.params.id));
+    if (todo) {
+      res.json(todo);
     } else {
-      res.status(404).send()
+      res.status(404).send();
     }
 });
 
   app.post('/todos' ,(req,res) => {
-    const {title, description} = req.body
-    const userID = Math.floor(Math.random() * 1000000);
-    const newUser = {id : userID , title, description};
-    todo.push(newUser);
-
-    res.status(201).json({newUser});
+    const newTodo = {
+      id: Math.floor(Math.random() * 1000000), // unique random id
+      title: req.body.title,
+      description: req.body.description
+    };
+    todos.push(newTodo);
+    res.status(201).json(newTodo);
   })
 
-  app.put('/todos/:id' , (req,res) => {
-    const userID = todo.findIndex(a => a.id === parseInt(req.params.id));
-    if(!userID){
-      res.status(404)
-    }
-    userID.id = req.body.id;
-    res.status(200).json({id :req.body.id})
-  })
-
-  app.delete('/todos/:id' , (req,res) => {
-    const userID = todo.findIndex(req.params.id);
-    if(userID){
-      todo = todo.removeIndex(req.params.id)
-      res.status(200).json({message : "Deleted"})
+  app.put('/todos/:id', (req, res) => {
+    const todoIndex = todos.findIndex(t => t.id === parseInt(req.params.id));
+    if (!todoIndex === -1) {
+      res.status(404).send();
     } else {
-      res.status(404)
+      todos[todoIndex].title = req.body.title;
+      todos[todoIndex].description = req.body.description;
+      res.json(todos[todoIndex]);
     }
-  })
-  app.listen(port, ()=>{console.log(`http://localhost:${port}/`)})
+  });
+  
+  app.delete('/todos/:id', (req, res) => {
+    const todoIndex = todos.findIndex(t => t.id === parseInt(req.params.id));
+    if (todoIndex === -1) {
+      res.status(404).send();
+    } else {
+      todos.splice(todoIndex, 1);
+      res.status(200).send();
+    }
+  });
+  
+  // for all other routes, return 404
+  app.use((req, res, next) => {
+    res.status(404).send();
+  });
+  
   module.exports = app;
