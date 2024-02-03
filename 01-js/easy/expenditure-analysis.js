@@ -17,7 +17,7 @@ function calculateTotalSpentByCategory(transactions) {
 			let y = {
 					category: obj.category, 
 					totalSpent: obj.price 
-    			};
+    					};
 			finalAns.push(y);
 			category.push(obj.category);
 		}

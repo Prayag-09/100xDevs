@@ -1,22 +1,35 @@
 const { Router } = require("express");
-const adminMiddleware = require("../middleware/admin");
+const {adminMiddleware} = require("../middleware/admin");
 const router = Router();
+const jwt = require('jsonwebtoken');
+import Admin from '../db/index'
 
-// Admin Routes
-app.post('/signup', (req, res) => {
-    // Implement admin signup logic
+const secret = "secRET";
+
+app.post('/signup',async (req, res) => {
+    const {username, password} = req.headers;
+    try{
+        const exist = await Admin.findOne({username,password});
+        if(!exist){
+            const newAdmin = await Admin.create({username,password});
+            res.status(200).json({newAdmin : newAdmin})
+        }
+        res.status(500).json({msg : " Admin already exists"})
+    } catch(err){
+        res.status(500).json(err);
+    }
 });
 
 app.post('/signin', (req, res) => {
-    // Implement admin signup logic
+    
 });
 
 app.post('/courses', adminMiddleware, (req, res) => {
-    // Implement course creation logic
+
 });
 
 app.get('/courses', adminMiddleware, (req, res) => {
-    // Implement fetching all courses logic
+
 });
 
 module.exports = router;
